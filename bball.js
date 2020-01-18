@@ -36,6 +36,13 @@
         return list;
     }
 
+    function shufflePlayers() {
+        const activePlayers = getActivePlayers();
+        const players = shuffle(activePlayers);
+        renderPlayers(players);
+        renderLineup();
+    }
+
     function attachListeners() {
         playersNode.addEventListener('click', event => {
             if (event.target.tagName !== 'input') {
@@ -47,12 +54,8 @@
             }
         });
         playersNode.addEventListener('change', renderLineup);
-        shuffleNode.addEventListener('click', event => {
-            const activePlayers = getActivePlayers();
-            const players = shuffle(activePlayers);
-            renderPlayers(players);
-            renderLineup();
-        });
+        shuffleNode.addEventListener('click', shufflePlayers);
+        shuffleNode.addEventListener('tap', shufflePlayers);
     }
 
     function renderPlayers(players = defaultPlayers) {
