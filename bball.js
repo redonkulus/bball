@@ -13,6 +13,28 @@
     ];
     const playersNode = document.getElementById('players');
     const lineupNode = document.getElementById('lineup');
+    const shuffleNode = document.getElementById('shuffle');
+
+    function shuffle(array) {
+        const list = [...array];
+        let currentIndex = list.length;
+        let temporaryValue;
+        let randomIndex;
+
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
+            // Pick a remaining element...
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+
+            // And swap it with the current element.
+            temporaryValue = list[currentIndex];
+            list[currentIndex] = list[randomIndex];
+            list[randomIndex] = temporaryValue;
+        }
+
+        return list;
+    }
 
     function attachListeners() {
         playersNode.addEventListener('click', event => {
@@ -25,11 +47,17 @@
             }
         });
         playersNode.addEventListener('change', renderLineup);
+        shuffleNode.addEventListener('click', event => {
+            const activePlayers = getActivePlayers();
+            const players = shuffle(activePlayers);
+            renderPlayers(players);
+            renderLineup();
+        });
     }
 
-    function renderPlayers() {
+    function renderPlayers(players = defaultPlayers) {
         const markup = [];
-        defaultPlayers.forEach(p => {
+        players.forEach(p => {
             markup.push(`
                 <li class="list-group-item">
                     <input class="active" type="checkbox" value="${p}" checked> ${p}</input>
