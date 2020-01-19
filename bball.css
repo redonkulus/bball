@@ -3,3 +3,11 @@
     border-radius:5px;
     cursor:pointer;
 }
+
+.draggable {
+    cursor: move;
+}
+
+.draggable.over {
+    border: 1px dashed #000;
+}
