@@ -14,7 +14,7 @@
     const playersNode = document.getElementById('players');
     const lineupNode = document.getElementById('lineup');
     const shuffleNode = document.getElementById('shuffle');
-    let dragSrcEl = null; // used to drag dragged item
+    let dragSrcEl = null; // used to store dragged item
     let pageY = 0; // used to determine drag direction
 
     function shuffle(array) {
@@ -64,10 +64,10 @@
      * Player Drag and Drop handlers
      */
     function handleDragStart(e) {
-        this.style.opacity = '0.4';
+        e.target.style.opacity = '0.4';
 
         // store reference to dragged element
-        dragSrcEl = this;
+        dragSrcEl = e.target;
         e.dataTransfer.effectAllowed = 'move';
         pageY = e.pageY;
     }
@@ -82,12 +82,12 @@
 
     function handleDragEnter(e) {
         // this / e.target is the current hover target.
-        this.classList.add('over');
+        e.target.classList.add('over');
     }
 
     function handleDragLeave(e) {
         // this / e.target is previous target element.
-        this.classList.remove('over');
+        e.target.classList.remove('over');
     }
 
     function handleDrop(e) {
@@ -97,13 +97,13 @@
         }
 
         // Don't do anything if dropping the same player we're dragging.
-        if (dragSrcEl != this) {
+        if (dragSrcEl != e.target) {
             if (e.pageY > pageY) {
                 // player was moved down
-                this.parentNode.insertBefore(dragSrcEl, this.nextElementSibling);
+                e.target.parentNode.insertBefore(dragSrcEl, e.target.nextElementSibling);
             } else {
                 // player was moved up
-                this.parentNode.insertBefore(dragSrcEl, this);
+                e.target.parentNode.insertBefore(dragSrcEl, e.target);
             }
             // re-render lineup based on new order
             renderLineup();
@@ -113,7 +113,7 @@
     }
 
     function handleDragEnd(e) {
-        this.style.opacity = '1.0';
+        e.target.style.opacity = '1.0';
         const draggableItems = Array.from(document.getElementsByClassName('draggable'));
         draggableItems.forEach(item => item.classList.remove('over'));
     }
@@ -131,8 +131,6 @@
             `);
         });
         playersNode.innerHTML = markup.join('');
-
-        attachDDListeners();
     }
 
     function renderLineup() {
@@ -191,23 +189,18 @@
             }
         });
         playersNode.addEventListener('change', renderLineup);
+
+        // drag and drop listeners
+        playersNode.addEventListener('dragstart', handleDragStart, false);
+        playersNode.addEventListener('dragenter', handleDragEnter, false);
+        playersNode.addEventListener('dragover', handleDragOver, false);
+        playersNode.addEventListener('dragleave', handleDragLeave, false);
+        playersNode.addEventListener('drop', handleDrop, false);
+        playersNode.addEventListener('dragend', handleDragEnd, false);
+
+        // shuffle player button
         shuffleNode.addEventListener('click', shufflePlayers);
         shuffleNode.addEventListener('tap', shufflePlayers);
-    }
-
-    /**
-     * Drag and Drop listeners for each player
-     */
-    function attachDDListeners() {
-        const draggableItems = Array.from(document.getElementsByClassName('draggable'));
-        draggableItems.forEach(item => {
-            item.addEventListener('dragstart', handleDragStart, false);
-            item.addEventListener('dragenter', handleDragEnter, false);
-            item.addEventListener('dragover', handleDragOver, false);
-            item.addEventListener('dragleave', handleDragLeave, false);
-            item.addEventListener('drop', handleDrop, false);
-            item.addEventListener('dragend', handleDragEnd, false);
-        });
     }
 
     // init
