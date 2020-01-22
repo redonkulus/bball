@@ -8,6 +8,14 @@
     cursor: move;
 }
 
+.draggable .btn {
+    visibility: hidden;
+}
+
+.draggable:hover .btn {
+    visibility: visible;
+}
+
 .draggable.over {
     border: 1px dashed #000;
 }
