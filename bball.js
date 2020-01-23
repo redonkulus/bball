@@ -9,19 +9,6 @@
     let dragCurIndex = 0; // used to track currently dragged item index in player list
     let pageY = 0; // used to determine drag direction
 
-    function move(index, delta) {
-        const newIndex = index + delta;
-        // Already at the top or bottom.
-        if (newIndex < 0  || newIndex === playerList.length) {
-            return;
-        }
-        // Sort the indixes
-        const indexes = [index, newIndex].sort((a, b) => a - b);
-
-        // Replace from lowest index, two elements, reverting the order
-        playerList.splice(indexes[0], 2, playerList[indexes[1]], playerList[indexes[0]]);
-    };
-
     function shufflePlayers() {
         let currentIndex = playerList.length;
         let temporaryValue;
@@ -112,12 +99,13 @@
             if (e.pageY > pageY) {
                 // player was moved down
                 e.target.parentNode.insertBefore(dragSrcEl, e.target.nextElementSibling);
-                move(dragCurIndex, 1);
             } else {
                 // player was moved up
                 e.target.parentNode.insertBefore(dragSrcEl, e.target);
-                move(dragCurIndex, -1);
             }
+            // update player list with new order 
+            const targetIndex = parseInt(e.target.dataset.idx, 10);
+            playerList.splice(targetIndex, 0, playerList.splice(dragCurIndex, 1)[0]);
             renderPlayers();
         }
 
