@@ -3,6 +3,12 @@
 header {
     padding: 10px 15px 1px;
     background-color: #37d0e8;
+    box-shadow: 1px -4px 10px #000;
+}
+
+header p {
+    font-size: 13px;
+    color: #333;
 }
 
 h1 {
