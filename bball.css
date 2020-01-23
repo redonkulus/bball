@@ -36,3 +36,9 @@ h1 {
 .draggable.over {
     border: 1px dashed #000;
 }
+
+@media (min-width: 576px) {
+    .lineup-wrap {
+        margin-top: 5.6rem;
+    }
+}
