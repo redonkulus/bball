@@ -1,14 +1,19 @@
 (function() {
+    // dom element references
     const addPlayerNode = document.getElementById('add-player');
     const playersNode = document.getElementById('players');
     const lineupNode = document.getElementById('lineup');
     const shuffleNode = document.getElementById('shuffle');
+    const quartersNode = document.getElementById('quarters');
 
     let playerList = JSON.parse(localStorage.getItem('playerList') || '[]'); // meta data for all players
     let dragSrcEl = null; // used to store dragged item
     let dragCurIndex = 0; // used to track currently dragged item index in player list
     let pageY = 0; // used to determine drag direction
 
+    /**
+     * Randomize order of players
+     */
     function shufflePlayers() {
         let currentIndex = playerList.length;
         let temporaryValue;
@@ -29,6 +34,10 @@
         renderPlayers();
     }
 
+    /**
+     * Adds a player to playerlist and saves to localstorage
+     * @param {Event} e Form submit event
+     */
     function addPlayer(e) {
         // prevent form from submitting
         if (e.preventDefault) {
@@ -43,6 +52,10 @@
         renderPlayers();
     }
 
+    /**
+     * Removes a player from the player list
+     * @param {String} id Name of player 
+     */
     function removePlayer(id) {
         for (let x = 0; x < playerList.length; x++) {
             if (playerList[x].name === id) {
@@ -53,6 +66,37 @@
         }
     }
 
+    /**
+     * Sets the quarter length and stores in local storage
+     */
+    function setQuarters() {
+        const quarters = parseInt(quartersNode.value, 10);
+        localStorage.setItem('quarters', quarters);
+        renderLineup();
+    }
+
+    /**
+     * Retrieves the quarter length from local storage or form select.
+     * If stored, modifies the form select to display the correct length
+     */
+    function getQuarters() {
+        const quarters = parseInt(localStorage.getItem('quarters'), 10);
+        if (quarters) {
+            // set selected form item
+            Array.from(document.querySelectorAll('#quarters option')).forEach((option, idx) => {
+                if (parseInt(option.value, 10) === quarters) {
+                    quartersNode.selectedIndex = idx;
+                }
+            });
+            return quarters;
+        } else {
+            return parseInt(quartersNode.value, 10) || 4;
+        }
+    }
+
+    /**
+     * Save playerlist to localstorage
+     */
     function savePlayers() {
         localStorage.setItem('playerList', JSON.stringify(playerList));
     }
@@ -119,7 +163,7 @@
     }
 
     /**
-     * Renderers
+     * Renders player list based playerList data
      */
     function renderPlayers() {
         const markup = [];
@@ -143,13 +187,16 @@
         savePlayers();
     }
 
+    /**
+     * Renders the lineup based on active players
+     */
     function renderLineup() {
         const listMarkup = [];
         if (!playerList.length) {
             listMarkup.push('Please add players to generate a lineup.');
         } else {
             const perQuarter = 5;
-            const periods = 8;
+            const periods = getQuarters();
             const total = perQuarter * periods;
     
             let x = 1;
@@ -240,6 +287,9 @@
                 e.target.select();
             }
         });
+
+        // quarters length handler
+        quartersNode.addEventListener('change', setQuarters);
     }
 
     // init
