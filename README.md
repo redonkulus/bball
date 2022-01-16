@@ -18,7 +18,7 @@ This tool takes a simple approach to generating a basketball lineup. Given a lis
 - Toggle if a player is active
 - Drag and drop players to fine tune lineups
 - Randomize the order of players
-
+- Formatting for easy printing
 
 ## Try It Out
 
