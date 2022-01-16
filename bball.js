@@ -44,12 +44,16 @@
             e.preventDefault();
         }
 
-        let formData = new FormData(addPlayerNode);
+        const formData = new FormData(addPlayerNode);
         const name = formData.get('add-player-input');
 
         playerList.push({ name, active: true });
 
         renderPlayers();
+
+        // highlight name to easily add more players
+        const inputNode = document.getElementById('add-player-input');
+        inputNode.select();
     }
 
     /**
