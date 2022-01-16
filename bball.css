@@ -42,3 +42,11 @@ h1 {
         margin-top: 5.6rem;
     }
 }
+
+@media print {
+    header,
+    details,
+    .lineups h3 {
+        display: none;
+    }
+}
