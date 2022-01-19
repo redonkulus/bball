@@ -7,7 +7,7 @@
         <meta name="keywords" content="basketball, bball, lineup, roster, youth basketball">
         <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
         <link rel="shortcut icon" href="favicon.ico" />
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
         <link rel="stylesheet" href="bball.css">
     </head>
     <body>
@@ -21,31 +21,27 @@
                 <details open=true class="mb-2 col-sm">
                     <summary>Modify Lineup</summary>
 
-                    <div class="d-flex justify-content-start">
-                        <form id="add-player" class="form-inline">
-                            <div class="input-group">
-                                <label class="sr-only" for="add-player-input">Add Players</label>
-                                <input type="text" class="form-control" id="add-player-input" name="add-player-input" placeholder="Enter player name">
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary">+</button>
-                                </div>
-                            </div>
-                        </form>
+                    <form id="add-player" class="d-flex align-items-baseline">
+                        <div class="input-group">
+                            <label class="visually-hidden" for="add-player-input">Add Players</label>
+                            <input type="text" class="form-control" id="add-player-input" name="add-player-input" placeholder="Enter player name">
+                            <button class="btn btn-primary">+</button>
+                        </div>
 
-                        <div class="align-self-center input-group ml-3" title="Bball games are 4 quarters. Sometimes leagues split each quarter in half to allow for substitutions.">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="quarters">Quarters</label>
+                        <div class="align-self-center mx-3 input-group">
+                            <label class="input-group-text" for="quarters">Quarters</label>
+                            <div>
+                                <select class="form-select" id="quarters" title="Bball games are 4 quarters. Sometimes leagues split each quarter in half to allow for substitutions.">
+                                    <option value="4">4</option>
+                                    <option value="8">8</option>
+                                </select>
                             </div>
-                            <select id="quarters">
-                                <option value="4">4</option>
-                                <option value="8">8</option>
-                            </select>
                         </div>
 
                         <button id="shuffle" class="btn" title="Shuffle Lineup">
                             <svg height="24" viewBox="0 0 1792 1792" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M666 481q-60 92-137 273-22-45-37-72.5t-40.5-63.5-51-56.5-63-35-81.5-14.5h-224q-14 0-23-9t-9-23v-192q0-14 9-23t23-9h224q250 0 410 225zm1126 799q0 14-9 23l-320 320q-9 9-23 9-13 0-22.5-9.5t-9.5-22.5v-192q-32 0-85 .5t-81 1-73-1-71-5-64-10.5-63-18.5-58-28.5-59-40-55-53.5-56-69.5q59-93 136-273 22 45 37 72.5t40.5 63.5 51 56.5 63 35 81.5 14.5h256v-192q0-14 9-23t23-9q12 0 24 10l319 319q9 9 9 23zm0-896q0 14-9 23l-320 320q-9 9-23 9-13 0-22.5-9.5t-9.5-22.5v-192h-256q-48 0-87 15t-69 45-51 61.5-45 77.5q-32 62-78 171-29 66-49.5 111t-54 105-64 100-74 83-90 68.5-106.5 42-128 16.5h-224q-14 0-23-9t-9-23v-192q0-14 9-23t23-9h224q48 0 87-15t69-45 51-61.5 45-77.5q32-62 78-171 29-66 49.5-111t54-105 64-100 74-83 90-68.5 106.5-42 128-16.5h256v-192q0-14 9-23t23-9q12 0 24 10l319 319q9 9 9 23z"/></svg>
                         </button>
-                    </div>
+                    </form>
 
                     <div class="mt-3">
                         <h3>Players</h3>
