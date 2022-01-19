@@ -1,21 +1,45 @@
 (function() {
     // dom element references
     const addPlayerNode = document.getElementById('add-player');
-    const playersNode = document.getElementById('players');
     const lineupNode = document.getElementById('lineup');
-    const shuffleNode = document.getElementById('shuffle');
+    const playersNode = document.getElementById('players');
     const quartersNode = document.getElementById('quarters');
+    const shareNode = document.getElementById('share');
 
-    let playerList = JSON.parse(localStorage.getItem('playerList') || '[]'); // meta data for all players
+    let data = loadData(); // data for all input
     let dragSrcEl = null; // used to store dragged item
     let dragCurIndex = 0; // used to track currently dragged item index in player list
     let pageY = 0; // used to determine drag direction
 
     /**
+     * Returns data from URL query params, local storage or default data
+     * @returns {Object} data
+     */
+    function loadData() {
+        // check for shared data
+        const params = new URLSearchParams(document.location.search);
+        const data = params.get('data');
+        if (data) {
+            document.location.search = ''; // reset location bar
+            return JSON.parse(data);
+        }
+
+        const lsData = localStorage.getItem('data');
+        return lsData ? JSON.parse(lsData) : { playerList: [], quarters: 4 };
+    }
+
+    /**
+     * Save data to localstorage
+     */
+     function saveData() {
+        localStorage.setItem('data', JSON.stringify(data));
+    }
+
+    /**
      * Randomize order of players
      */
     function shufflePlayers() {
-        let currentIndex = playerList.length;
+        let currentIndex = data.playerList.length;
         let temporaryValue;
         let randomIndex;
 
@@ -26,9 +50,9 @@
             currentIndex -= 1;
 
             // And swap it with the current element.
-            temporaryValue = playerList[currentIndex];
-            playerList[currentIndex] = playerList[randomIndex];
-            playerList[randomIndex] = temporaryValue;
+            temporaryValue = data.playerList[currentIndex];
+            data.playerList[currentIndex] = data.playerList[randomIndex];
+            data.playerList[randomIndex] = temporaryValue;
         }
 
         renderPlayers();
@@ -36,20 +60,15 @@
 
     /**
      * Adds a player to playerlist and saves to localstorage
-     * @param {Event} e Form submit event
      */
-    function addPlayer(e) {
-        // prevent form from submitting
-        if (e.preventDefault) {
-            e.preventDefault();
-        }
-
+    function addPlayer() {
         const formData = new FormData(addPlayerNode);
         const name = formData.get('add-player-input');
 
-        playerList.push({ name, active: true });
-
-        renderPlayers();
+        if (name && name !== '') {
+            data.playerList.push({ name, active: true });
+            renderPlayers();
+        }
 
         // highlight name to easily add more players
         const inputNode = document.getElementById('add-player-input');
@@ -61,9 +80,9 @@
      * @param {String} id Name of player 
      */
     function removePlayer(id) {
-        for (let x = 0; x < playerList.length; x++) {
-            if (playerList[x].name === id) {
-                playerList.splice(x, 1);
+        for (let x = 0; x < data.playerList.length; x++) {
+            if (data.playerList[x].name === id) {
+                data.playerList.splice(x, 1);
                 renderPlayers();
                 break;
             }
@@ -75,34 +94,8 @@
      */
     function setQuarters() {
         const quarters = parseInt(quartersNode.value, 10);
-        localStorage.setItem('quarters', quarters);
-        renderLineup();
-    }
-
-    /**
-     * Retrieves the quarter length from local storage or form select.
-     * If stored, modifies the form select to display the correct length
-     */
-    function getQuarters() {
-        const quarters = parseInt(localStorage.getItem('quarters'), 10);
-        if (quarters) {
-            // set selected form item
-            Array.from(document.querySelectorAll('#quarters option')).forEach((option, idx) => {
-                if (parseInt(option.value, 10) === quarters) {
-                    quartersNode.selectedIndex = idx;
-                }
-            });
-            return quarters;
-        } else {
-            return parseInt(quartersNode.value, 10) || 4;
-        }
-    }
-
-    /**
-     * Save playerlist to localstorage
-     */
-    function savePlayers() {
-        localStorage.setItem('playerList', JSON.stringify(playerList));
+        data.quarters = quarters;
+        refreshApp();
     }
 
     /**
@@ -153,7 +146,7 @@
             }
             // update player list with new order 
             const targetIndex = parseInt(e.target.dataset.idx, 10);
-            playerList.splice(targetIndex, 0, playerList.splice(dragCurIndex, 1)[0]);
+            data.playerList.splice(targetIndex, 0, data.playerList.splice(dragCurIndex, 1)[0]);
             renderPlayers();
         }
 
@@ -167,11 +160,19 @@
     }
 
     /**
+     * Manages rendering and data updating
+     */
+    function refreshApp() {
+        renderLineup();
+        saveData();
+    }
+
+    /**
      * Renders player list based playerList data
      */
     function renderPlayers() {
         const markup = [];
-        playerList.forEach((p, idx) => {
+        data.playerList.forEach((p, idx) => {
             const checked = p.active === true ? 'checked' : '';
             markup.push(`
                 <li id="${p.name}" data-idx=${idx} class="list-group-item d-flex justify-content-between draggable" draggable="true">
@@ -187,8 +188,7 @@
             `);
         });
         playersNode.innerHTML = markup.join('');
-        renderLineup();
-        savePlayers();
+        refreshApp();
     }
 
     /**
@@ -196,11 +196,11 @@
      */
     function renderLineup() {
         const listMarkup = [];
-        if (!playerList.length) {
+        if (!data.playerList.length) {
             listMarkup.push('Please add players to generate a lineup.');
         } else {
             const perQuarter = 5;
-            const periods = getQuarters();
+            const periods = data.quarters;
             const total = perQuarter * periods;
     
             let x = 1;
@@ -208,7 +208,14 @@
             let period = 1;
 
             let currentPlayers = [];
-            const activePlayers = playerList.filter(p => p.active === true);
+            const activePlayers = data.playerList.filter(p => p.active === true);
+
+            // select proper quarter node
+            Array.from(document.querySelectorAll('#quarters option')).forEach((option, idx) => {
+                if (parseInt(option.value, 10) === data.quarters) {
+                    quartersNode.selectedIndex = idx;
+                }
+            });
 
             // loop through each player to add to lineup
             while (x <= total) {
@@ -252,19 +259,51 @@
     }
 
     /**
+     * Generate URL to share lineup
+     */
+     function shareLineup() {
+        // set active state
+        shareNode.classList.toggle('active');
+
+        // collect data to copy
+        const params = new URLSearchParams({
+            data: JSON.stringify(data)
+        })
+
+        // create fake input element
+        const input = document.createElement('input');
+        document.body.appendChild(input);
+
+        // set value and copy it
+        const url = new URL(document.location.href);
+        url.search = params;
+        input.value = url.toString();
+        input.select();
+        document.execCommand('copy');
+
+        // remove element
+        document.body.removeChild(input);
+
+        // remove active class
+        setTimeout(() => {
+            shareNode.classList.toggle('active');
+        }, 3000);
+    }
+
+    /**
      * DOM event handlers
      */
     function attachListeners() {
-        playersNode.addEventListener('click', event => {
-            const { id } = event.target.closest('li');
+        playersNode.addEventListener('click', e => {
+            const { id } = e.target.closest('li');
 
             // handle remove player
-            if (event.target.closest('button')) {
+            if (e.target.closest('button')) {
                 removePlayer(id);
             } else {
-                for (let x = 0; x < playerList.length; x++) {
-                    if (playerList[x].name === id) {
-                        playerList[x].active = !playerList[x].active;
+                for (let x = 0; x < data.playerList.length; x++) {
+                    if (data.playerList[x].name === id) {
+                        data.playerList[x].active = !data.playerList[x].active;
                         renderPlayers();
                         break;
                     }
@@ -280,15 +319,29 @@
         playersNode.addEventListener('drop', handleDrop, false);
         playersNode.addEventListener('dragend', handleDragEnd, false);
 
-        // shuffle player button
-        shuffleNode.addEventListener('click', shufflePlayers);
-        shuffleNode.addEventListener('tap', shufflePlayers);
-
-        // add player form
-        addPlayerNode.addEventListener('submit', addPlayer);
+        // handle all form events
         addPlayerNode.addEventListener('click', e => {
-            if (e.target.tagName.toLowerCase() === 'input') {
-                e.target.select();
+            e.preventDefault();
+            const { target } = e;
+
+            // share button
+            if (target.closest('#share')) {
+                return shareLineup();
+            }
+
+            // shuffle players
+            if (target.closest('#shuffle')) {
+                return shufflePlayers();
+            }
+
+            // add player
+            if (target.closest('#add-player-submit')) {
+                return addPlayer();
+            }
+
+            // select add player text
+            if (target.closest('#add-player-input')) {
+                return target.select();
             }
         });
 
